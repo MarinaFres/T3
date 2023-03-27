@@ -1,7 +1,7 @@
 """
     Tercera tarea de APA - manejo de vectores
 
-    Nombre y apellidos:
+    Nombre y apellidos: Marina Fresneda Manzano
 """
 
 class Vector:
@@ -17,12 +17,14 @@ class Vector:
 
         return None      # Orden superflua
 
+
     def __repr__(self):
         """
         Representación *oficial* del vector que permite construir uno nuevo idéntico mediante corta-y-pega.
         """
 
         return 'Vector(' + repr(self.vector) + ')'
+
 
     def __str__(self):
         """
@@ -31,12 +33,14 @@ class Vector:
 
         return str(self.vector)
 
+
     def __getitem__(self, key):
         """
         Devuelve un elemento o una loncha del vector.
         """
 
         return self.vector[key]
+
 
     def __setitem__(self, key, value):
         """
@@ -45,12 +49,14 @@ class Vector:
 
         self.vector[key] = value
 
+
     def __len__(self):
         """
         Devuelve la longitud del vector.
         """
 
         return len(self.vector)
+
 
     def __add__(self, other):
         """
@@ -62,6 +68,7 @@ class Vector:
         else:
             return Vector(uno + otro for uno, otro in zip(self, other))
 
+
     __radd__ = __add__
 
     def __neg__(self):
@@ -71,6 +78,7 @@ class Vector:
 
         return Vector([-1 * item for item in self])
 
+
     def __sub__(self, other):
         """
         Resta al vector otro vector o una constante.
@@ -78,10 +86,103 @@ class Vector:
 
         return -(-self + other)
 
+
     def __rsub__(self, other):     # No puede ser __rsub__ = __sub__
         """
         Método reflejado de la resta, usado cuando el primer elemento no pertenece a la clase Vector.
         """
 
         return -self + other
+    
+
+    def __mul__(self, other):
+        """
+        Realiza la multiplicación de Hadamard o la multiplicación por un escalar.
+        >>> v1 = Vector([1, 2, 3])
+        >>> v2 = Vector([4, 5, 6])
+        >>> v1 * 2
+        Vector([2, 4, 6])
+        >>> v1 * v2
+        Vector([4, 10, 18])
+        """
+        if isinstance(other, (int, float, complex)):
+            return Vector(uno * other for uno in self)
+        else:
+            return Vector(uno * otro for uno, otro in zip(self, other))
+
+
+    def __rmul__(self, other):
+        """
+        Realiza la multiplicación por un escalar.
+        """
+        return self.__mul__(other)
+    
+
+    def __matmul__(self, other):
+        """
+        Multiplica el vector actual por otro vector (producto escalar).
+        >>> v1 = Vector([1, 2, 3])
+        >>> v2 = Vector([4, 5, 6])
+        >>> v1 @ v2
+        32
+        """
+        if isinstance(other, Vector) and len(self) == len(other):
+            return sum(a * b for a, b in zip(self, other))
+        else:
+            return None
+
+    __rmatmul__ = __matmul__
+    
+
+    def __floordiv__(self, other):
+        """
+        Realiza la operación de tangente con un escalar.
+        >>> v1 = Vector([2, 1, 2])
+        >>> v2 = Vector([0.5, 1, 0.5])
+        >>> v1 // v2
+        Vector([1.0, 2.0, 1.0])
+        """
+        if isinstance(other, Vector):
+            return Vector((uno * otro / sum(numero ** 2 for numero in otro)) * otro for uno, otro in zip(self, other))
+        else:
+            return None
+
+    def __rfloordiv__(self, other):
+        """
+        Realiza la operación de tangente con un escalar por la derecha.
+        """
+        if isinstance(other, Vector):
+         return Vector((uno * otro / sum(numero ** 2 for numero in otro)) * [numero] for uno, numero in zip(self, other))
+        else:
+         return None
+        
+    def __abs__(self):
+        return (sum(x**2 for x in self))**(1/2)
+    
+    def __mod__(self, other):
+        """
+        Devuelve la componente normal del vector.
+        >>> v1 = Vector([2, 1, 2])
+        >>> v2 = Vector([0.5, 1, 0.5])
+        >>> v1 % v2
+        Vector([1.0, -1.0, 1.0])
+        """
+        try:
+            unit_v = self // abs(self)
+            return unit_v * (self @ unit_v)
+        except ZeroDivisionError:
+            return None
+
+
+    def __rmod__(self, other):
+        """
+        Devuelve la componente normal del vector.
+        """
+        return self.__mod__(other)
+
+import doctest
+doctest.testmod()
+        
+    
+
 
