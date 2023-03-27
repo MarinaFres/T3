@@ -76,6 +76,9 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `algebra/vectores.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+<img src="img/Captura_de_pantalla1.png" width="480" align="center">
+<img src="img/Captura_de_pantalla2.png" width="480" align="center">
+
 #### Código desarrollado
 
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
@@ -193,6 +196,12 @@ class Vector:
     def __rmul__(self, other):
         """
         Realiza la multiplicación por un escalar.
+        >>> v1 = Vector([1, 2, 3])
+        >>> v2 = Vector([4, 5, 6])
+        >>> 2 * v1
+        Vector([2, 4, 6])
+        >>> v2 * v1
+        Vector([4, 10, 18])
         """
         return self.__mul__(other)
     
@@ -215,29 +224,24 @@ class Vector:
 
     def __floordiv__(self, other):
         """
-        Realiza la operación de tangente con un escalar.
+        Devuelva la componente tangencial
         >>> v1 = Vector([2, 1, 2])
         >>> v2 = Vector([0.5, 1, 0.5])
         >>> v1 // v2
         Vector([1.0, 2.0, 1.0])
         """
         if isinstance(other, Vector):
-            return Vector((uno * otro / sum(numero ** 2 for numero in otro)) * otro for uno, otro in zip(self, other))
-        else:
-            return None
+            return Vector([(sum(a * b for a, b in zip(self,other) )// (sum(a ** 2 for a in other) **0.5)) * b for  b in  other])
+
 
     def __rfloordiv__(self, other):
         """
         Realiza la operación de tangente con un escalar por la derecha.
         """
         if isinstance(other, Vector):
-         return Vector((uno * otro / sum(numero ** 2 for numero in otro)) * [numero] for uno, numero in zip(self, other))
-        else:
-         return None
+            return Vector([(other * b // (sum(a ** 2 for a in self) **0.5)) * b for  b in  self])
         
-    def __abs__(self):
-        return (sum(x**2 for x in self))**(1/2)
-    
+
     def __mod__(self, other):
         """
         Devuelve la componente normal del vector.
@@ -246,18 +250,14 @@ class Vector:
         >>> v1 % v2
         Vector([1.0, -1.0, 1.0])
         """
-        try:
-            unit_v = self // abs(self)
-            return unit_v * (self @ unit_v)
-        except ZeroDivisionError:
-            return None
+        return self-self // other
 
 
     def __rmod__(self, other):
         """
         Devuelve la componente normal del vector.
         """
-        return self.__mod__(other)
+        return other.__mod__(self)
 
 import doctest
 doctest.testmod()
